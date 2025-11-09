@@ -3,7 +3,7 @@
 This [Cloudflare Pages](https://pages.cloudflare.com/) site acts as a [Git LFS](https://git-lfs.com/) server backed by any S3-compatible service.
 
 - By replacing GitHub's default LFS server with an [R2](https://developers.cloudflare.com/r2) bucket behind this proxy, LFS uploads and downloads become free instead of $0.0875/GiB exceeding 10 GiB/month across all repos [and forks](https://docs.github.com/en/repositories/working-with-files/managing-large-files/collaboration-with-git-large-file-storage#pushing-large-files-to-forks). Storage exceeding the free tier costs $0.015/GB-month on R2 instead of $0.07/GB-month on GitHub.
-- On most services, latency is low enough to [serve entire websites](https://github.com/milkey-mouse/git-lfs-client-worker) directly from your LFS server. This also allows you to transparently overcome the [25 MiB](https://developers.cloudflare.com/pages/platform/limits/#file-size) Cloudflare Pages file size limit by automatically adding any files over this size to LFS.
+- On most services, latency is low enough to [serve entire websites](https://github.com/twilligon/git-lfs-client-worker) directly from your LFS server. This also allows you to transparently overcome the [25 MiB](https://developers.cloudflare.com/pages/platform/limits/#file-size) Cloudflare Pages file size limit by automatically adding any files over this size to LFS.
 
 # Usage
 
@@ -19,7 +19,7 @@ First, create a bucket on an S3-compatible object store to host your LFS assets.
 - [Linode Object Storage](https://www.linode.com/docs/products/storage/object-storage/guides/manage-buckets/)
 - [DigitalOcean Spaces](https://docs.digitalocean.com/products/spaces/how-to/create/)
 
-We recommend R2 for its generous free tier: your LFS repos can store up to 10 GB and use unlimited bandwidth to write up to 1 million objects and read up to 10 million objects. If serving assets via [LFS Client Worker](https://github.com/milkey-mouse/git-lfs-client-worker), R2 has the additional benefit of being in the same datacenters as the worker.
+We recommend R2 for its generous free tier: your LFS repos can store up to 10 GB and use unlimited bandwidth to write up to 1 million objects and read up to 10 million objects. If serving assets via [LFS Client Worker](https://github.com/twilligon/git-lfs-client-worker), R2 has the additional benefit of being in the same datacenters as the worker.
 
 ### Create an access key
 
@@ -54,12 +54,12 @@ The proxy is stateless, so you can switch instances just by changing your LFS se
 
 To host your own instance of the proxy:
 
-- [Fork](https://github.com/milkey-mouse/git-lfs-s3-proxy/fork) this repo (`milkey-mouse/git-lfs-s3-proxy`) to your account.
+- [Fork](https://github.com/twilligon/git-lfs-s3-proxy/fork) this repo (`twilligon/git-lfs-s3-proxy`) to your account.
 - Follow the [Cloudflare Pages Get Started guide](https://developers.cloudflare.com/pages/get-started/guide/):
   - [Sign up for Cloudflare](https://dash.cloudflare.com/sign-up/workers-and-pages) if you haven't already.
   - [Create a new Pages site](https://dash.cloudflare.com/?to=/:account/pages/new/provider/github)
     - Add your GitHub account to Pages.
-    - Grant access to your fork of `milkey-mouse/git-lfs-s3-proxy`.
+    - Grant access to your fork of `twilligon/git-lfs-s3-proxy`.
     - Set up your Pages site: set **Build command** to `npm install` and leave all other settings on their defaults.
 - If you own a domain name (e.g. `example.com`), you can [add a CNAME record](https://developers.cloudflare.com/pages/platform/custom-domains/#add-a-custom-cname-record) to point a subdomain (e.g. `git-lfs-s3-proxy.example.com`) at your instance. If you don't own a domain, a `pages.dev` subdomain will work just as well, except you'll have to change your LFS server URL if you ever stop using the proxy.
 
@@ -118,9 +118,9 @@ If you were already using Git LFS, ensure any existing LFS objects are uploaded 
 GitLab "helpfully" rejects commits containing "missing" LFS objects. After configuring a non-GitLab LFS server, GitLab will consider all new LFS objects "missing" and reject new commits:
 
     remote: GitLab: LFS objects are missing. Ensure LFS is properly set up or try a manual "git lfs push --all".
-    To gitlab.com:milkey-mouse/lfs-test
+    To gitlab.com:twilligon/lfs-test
      ! [remote rejected] main -> main (pre-receive hook declined)
-    error: failed to push some refs to 'gitlab.com:milkey-mouse/lfs-test'
+    error: failed to push some refs to 'gitlab.com:twilligon/lfs-test'
 
 To disable this "feature", disable LFS on the GitLab repository. This can be done via the repository's GitLab page with **Settings** > **General** > **Visibility, project features, permissions** (click **Expand**) > **Repository** > **Git Large File Storage (LFS)** (disable, then click **Save changes**), or via the API:
 
